@@ -92,7 +92,7 @@ This project explores how real-time mobility data can be ingested, stored, and v
 - Producer publishes vehicle positions to Kafka
 - Consumer aggregates data for visualization
 - Grafana dashboard: *“Where is my bus right now?”*
-- Tools: `Apache Kafka`, `Grafana` *(optional: Spark Streaming)*
+- Tools: `Apache Kafka`, `Grafana`, `Azure ACI` *(optional: Spark Streaming)*
 - **Result:** Near real-time transport monitoring system
 
 ---
@@ -121,7 +121,7 @@ GitHub event archives are massive, semi-structured, and unsuitable for naive pro
 - Spark cluster for distributed processing
 - JSON → Parquet / Iceberg (Data Lake)
 - Advanced analytics (sessionization)
-- Tools: `PySpark`, `Dockerized Spark`, `Parquet`
+- Tools: `PySpark`, `Dockerized Spark`, `Parquet`, `Azure Blob Storage`
 - **Result:** Optimized Data Lake architecture
 
 ---
