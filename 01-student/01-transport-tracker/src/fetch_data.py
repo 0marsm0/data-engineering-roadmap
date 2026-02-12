@@ -14,7 +14,34 @@ def extract_data(url, site_id, api_key):
 
 
 def transform_data(raw):
-    df = pd.DataFrame(raw)
+
+    data = raw["departures"]
+    df = pd.json_normalize(data, sep="_")
+    clean_df = df[
+        [
+            "route_designation",
+            "stop_name",
+            "scheduled",
+            "realtime",
+            "delay",
+            "stop_lat",
+            "stop_lon",
+        ]
+    ].copy()
+    clean_df = clean_df.rename(
+        columns={
+            "stop_name": "stop_point_name",
+            "scheduled": "scheduled_time",
+            "realtime": "actual_time",
+            "delay": "delay_seconds",
+        }
+    )
+
+    clean_df[["scheduled_time", "realtime"]] = clean_df[
+        ["scheduled_time", "realtime"]
+    ].apply(pd.to_datetime)
+
+    return clean_df
 
 
 def load_data(cleaned_data, db_conn):
@@ -31,9 +58,6 @@ if __name__ == "__main__":
         print("Exiting")
         exit()
 
-    import json
-
-    print(json.dumps(raw_data, indent=4, ensure_ascii=False))
-
-    # filtered_data = transform_data(raw_data)
+    filtered_data = transform_data(raw_data)
+    print(filtered_data)
     # load_data(filtered_data, engine)
