@@ -27,4 +27,7 @@ for key, el in config_dict.items():
         raise ValueError(f"Error: {key} not found! Check your .env")
 
 
-DATABASE_URL = f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+DB_PATH = os.getenv("DB_PATH")
+
+# DATABASE_URL = f"duckdb+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+DATABASE_URL = f"duckdb:///{DB_PATH}"

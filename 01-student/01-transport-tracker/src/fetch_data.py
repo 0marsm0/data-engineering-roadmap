@@ -37,20 +37,24 @@ def transform_data(raw):
         }
     )
 
-    clean_df[["scheduled_time", "realtime"]] = clean_df[
-        ["scheduled_time", "realtime"]
+    clean_df[["scheduled_time", "actual_time"]] = clean_df[
+        ["scheduled_time", "actual_time"]
     ].apply(pd.to_datetime)
 
     return clean_df
 
 
-def load_data(cleaned_data, db_conn):
-    pass
+def load_data(df, table, db_con):
+    try:
+        df.to_sql(name=table, con=db_con, if_exists="append", index=False)
+        print(f"Table {table} successfully created")
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 if __name__ == "__main__":
 
-    # engine = create_engine(DATABASE_URL)
+    engine = create_engine(DATABASE_URL)
     print("Connecting to API")
     raw_data = extract_data(BASE_URL, SITE_ID, TRAFIKLAB_API)
 
@@ -60,4 +64,4 @@ if __name__ == "__main__":
 
     filtered_data = transform_data(raw_data)
     print(filtered_data)
-    # load_data(filtered_data, engine)
+    load_data(filtered_data, "bus_delays", engine)
