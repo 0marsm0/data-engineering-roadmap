@@ -4,10 +4,14 @@ from dotenv import load_dotenv
 load_dotenv(override=False)
 
 TRAFIKLAB_API = os.getenv("TRAFIKLAB_API_KEY")
-SITE_ID = os.getenv("SITE_ID", "740009117")
+SITE_IDS = os.getenv("SITE_IDS").split(",")
+SITE_IDS = [SITE_ID.strip() for SITE_ID in SITE_IDS]
+
 BASE_URL = "https://realtime-api.trafiklab.se/v1/departures/"
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+
+print(SITE_IDS)
 
 print(f"CONFIG: Connecting to database: {DATABASE_URL}")
 

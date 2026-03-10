@@ -1,4 +1,4 @@
-from config import TRAFIKLAB_API, DATABASE_URL, SITE_ID, BASE_URL
+from config import TRAFIKLAB_API, DATABASE_URL, SITE_IDS, BASE_URL
 import pandas as pd
 from sqlalchemy import create_engine
 import requests
@@ -34,13 +34,19 @@ def transform_data(raw):
     df = pd.json_normalize(data, sep="_")
 
     cols = {
-        "route_designation": "route_number",
+        "trip_trip_id": "trip_id",
+        "route_transport_mode": "transport_mode",
+        "route_designation": "line_number",
+        "route_name": "line",
+        "route_direction": "direction",
+        "route_origin_name": "start_station",
+        "route_destination_name": "end_station",
         "stop_name": "stop_point_name",
         "scheduled": "scheduled_time",
         "realtime": "actual_time",
         "delay": "delay_seconds",
-        "stop_lat": "stop_lat",
-        "stop_lon": "stop_lon",
+        "canceled": "is_canceled",
+        "is_realtime": "is_realtime",
     }
 
     try:
@@ -88,15 +94,17 @@ if __name__ == "__main__":
         sys.exit(1)
 
     while True:
-        try:
-            raw_data = extract_data(BASE_URL, SITE_ID, TRAFIKLAB_API)
-            if raw_data:
-                filtered_data = transform_data(raw_data)
-                if filtered_data is not None:
-                    load_data(filtered_data, "bus_delays", engine)
-            else:
-                logger.warning("No data received from API. Skipping cycle.")
-        except Exception as e:
-            logger.error(f"Unexpected error in main loop: {e}")
+        for site_id in SITE_IDS:
+            try:
+                raw_data = extract_data(BASE_URL, site_id, TRAFIKLAB_API)
+                if raw_data:
+                    filtered_data = transform_data(raw_data)
+                    if filtered_data is not None:
+                        load_data(filtered_data, "bus_delays", engine)
+                    time.sleep(2)
+                else:
+                    logger.warning("No data received from API. Skipping cycle.")
+            except Exception as e:
+                logger.error(f"Unexpected error in main loop: {e}")
 
         time.sleep(60)
