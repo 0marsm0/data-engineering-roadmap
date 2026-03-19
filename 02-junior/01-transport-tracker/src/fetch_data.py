@@ -1,4 +1,11 @@
-from config import TRAFIKLAB_API, DATABASE_URL, SITE_IDS, BASE_URL
+from config import (
+    TRAFIKLAB_API,
+    DATABASE_URL,
+    SITE_IDS,
+    BASE_URL,
+    TELEGRAM_BOT_TOKEN,
+    TELEGRAM_CHAT_ID,
+)
 import pandas as pd
 from sqlalchemy import create_engine
 import requests
@@ -70,6 +77,22 @@ def load_data(df, table, db_con):
         logger.error(f"Database error: {e}")
 
 
+def send_telegram_alert(message):
+    token = TELEGRAM_BOT_TOKEN
+    chat_id = TELEGRAM_CHAT_ID
+
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+
+    payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
+
+    try:
+        logger.info(f"Sending to {chat_id} message: {message}")
+        response = requests.post(url, data=payload)
+        response.raise_for_status()
+    except Exception as e:
+        logger.error(f"Error sending message via Telegram: {e}")
+
+
 if __name__ == "__main__":
 
     engine = create_engine(DATABASE_URL)
@@ -91,7 +114,12 @@ if __name__ == "__main__":
 
     if not connected:
         logger.critical("Could not connect to database after 10 attempts. Exiting.")
+        send_telegram_alert(
+            "<b>Critical Error:</b> Database is not available at the moment. Stopping gathering data."
+        )
         sys.exit(1)
+
+    send_telegram_alert("Starting gathering data.")
 
     while True:
         for site_id in SITE_IDS:
@@ -106,5 +134,6 @@ if __name__ == "__main__":
                     logger.warning("No data received from API. Skipping cycle.")
             except Exception as e:
                 logger.error(f"Unexpected error in main loop: {e}")
+                send_telegram_alert(f"<b>Error in Metro Pulse Tracker:</b> {e}")
 
         time.sleep(60)

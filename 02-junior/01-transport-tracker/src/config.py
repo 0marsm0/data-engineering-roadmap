@@ -7,11 +7,12 @@ TRAFIKLAB_API = os.getenv("TRAFIKLAB_API_KEY")
 SITE_IDS = os.getenv("SITE_IDS").split(",")
 SITE_IDS = [SITE_ID.strip() for SITE_ID in SITE_IDS]
 
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
 BASE_URL = "https://realtime-api.trafiklab.se/v1/departures/"
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-
-print(SITE_IDS)
 
 print(f"CONFIG: Connecting to database: {DATABASE_URL}")
 
